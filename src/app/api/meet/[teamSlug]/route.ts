@@ -5,15 +5,25 @@ export const revalidate = 10;
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { teamSlug: string } }
+  { params }: { params: { teamSlug: string } },
 ) {
   const searchParams = request.nextUrl.searchParams;
   const pin = searchParams.get("pin");
   if (!params.teamSlug) {
-    throw new Error("Missing teamSlug");
+    return new Response(
+      JSON.stringify({
+        error: "Missing teamSlug",
+      }),
+      { status: 400 },
+    );
   }
   if (!pin) {
-    throw new Error("Missing pin");
+    return new Response(
+      JSON.stringify({
+        error: "Missing pin",
+      }),
+      { status: 400 },
+    );
   }
   const supabase = await getSupabseClient();
   const { data: teams, error: teamError } = await supabase
@@ -27,7 +37,7 @@ export async function GET(
       JSON.stringify({
         error: "Team not found",
       }),
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -36,7 +46,7 @@ export async function GET(
       JSON.stringify({
         error: "Invalid pin",
       }),
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -53,7 +63,7 @@ export async function GET(
       JSON.stringify({
         error: "Team not found",
       }),
-      { status: 404 }
+      { status: 404 },
     );
   }
 
@@ -67,7 +77,7 @@ export async function GET(
       JSON.stringify({
         error: "Error getting meetings",
       }),
-      { status: 500 }
+      { status: 500 },
     );
   }
   return new Response(
@@ -75,6 +85,6 @@ export async function GET(
       team,
       meetings,
     }),
-    { status: 200 }
+    { status: 200 },
   );
 }

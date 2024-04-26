@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { RocketIcon } from "@radix-ui/react-icons";
 import {
   Card,
   CardContent,
@@ -7,14 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 import Pin from "./pin";
-import { cn } from "../../lib/utils";
-import { Alert, AlertDescription, AlertTitle } from "../../components/ui/alert";
-import { RocketIcon } from "@radix-ui/react-icons";
 
 const getData = async (teamSlug: string, pin: string) => {
   const response = await fetch(
-    `${process.env.SERVER_BASE_URL}/api/meet/${teamSlug}?pin=${pin}`
+    `${process.env.SERVER_BASE_URL}/api/meet/${teamSlug}?pin=${pin}`,
   );
   if (!response.ok) {
     if (response.status === 401) {

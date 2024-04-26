@@ -1,14 +1,11 @@
 "use client";
-
 import { useState } from "react";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import {
   InputOTP,
   InputOTPGroup,
-  InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -17,7 +14,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "../../lib/utils";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function Pin({ teamSlug }: { teamSlug: string }) {
   const [pin, setPin] = useState("");

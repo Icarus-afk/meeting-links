@@ -1,8 +1,7 @@
 "use client";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { RocketIcon } from "@radix-ui/react-icons";
 import { usePathname, useRouter } from "next/navigation";
+import { RocketIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
 
 export default function Header() {
   const router = useRouter();
