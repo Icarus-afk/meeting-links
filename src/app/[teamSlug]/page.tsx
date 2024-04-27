@@ -14,15 +14,13 @@ import Pin from "./pin";
 
 const getData = async (teamSlug: string, pin: string) => {
   const response = await fetch(
-    `${process.env.SERVER_BASE_URL}/api/meet/${teamSlug}?pin=${pin}`,
+    `${process.env.SERVER_BASE_URL}/api/meet/${teamSlug}?pin=${pin}`
   );
-  if (!response.ok) {
-    if (response.status === 401) {
-      return {
-        error: "Invalid pin",
-        code: 401,
-      };
-    }
+  if (response.status === 401) {
+    return {
+      error: "Invalid pin",
+      code: 401,
+    };
   } else if (response.status === 404) {
     return {
       error: "Team not found",
@@ -53,20 +51,23 @@ export default async function TeamHome({
   if (!pin) {
     return <Pin teamSlug={teamSlug} />;
   }
-  if (!teamSlug) {
-    return <div>Missing teamSlug</div>;
-  }
 
   const { data, code, error } = await getData(teamSlug, pin.value);
 
-  if (code === 404) {
-    return <div>Data not found</div>;
-  }
   if (code === 401) {
-    return <Pin teamSlug={teamSlug} />;
+    return <Pin teamSlug={teamSlug} error={error || undefined} />;
   }
-  if (code === 500) {
-    return <div>Error getting meetings</div>;
+
+  if (code === 404 || code === 403 || code === 500) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Card className={cn("w-[380px]")}>
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        </Card>
+      </div>
+    );
   }
 
   return (

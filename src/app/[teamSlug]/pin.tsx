@@ -15,22 +15,34 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { cn } from "@/lib/utils";
 
-export default function Pin({ teamSlug }: { teamSlug: string }) {
+export default function Pin({
+  teamSlug,
+  error,
+}: {
+  teamSlug: string;
+  error?: string;
+}) {
   const [pin, setPin] = useState("");
 
   return (
     <div className="h-screen flex items-center justify-center">
       <Card className={cn("w-[380px]")}>
         <CardHeader>
-          <CardTitle>Enter Pin</CardTitle>
-          <CardDescription>Enter the 6 digit pin</CardDescription>
+          <CardTitle>Enter the 4 digit pin</CardTitle>
+          {/* <CardDescription>Enter the 4 digit pin</CardDescription> */}
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
         </CardHeader>
         <CardContent className="grid gap-4">
           <div>
             <InputOTP
-              maxLength={6}
+              maxLength={4}
               pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
               value={pin}
               onChange={(value) => {
@@ -42,8 +54,6 @@ export default function Pin({ teamSlug }: { teamSlug: string }) {
                 <InputOTPSlot index={1} />
                 <InputOTPSlot index={2} />
                 <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
               </InputOTPGroup>
             </InputOTP>
           </div>

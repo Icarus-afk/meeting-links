@@ -22,8 +22,9 @@ export default function Home() {
     if (!teamSlug) {
       return;
     }
-    document.cookie = `teamSlug=${teamSlug}`;
-    router.push(`/${teamSlug}`);
+    let slug = teamSlug.trim().toLowerCase();
+    document.cookie = `teamSlug=${slug}; max-age=3600`;
+    router.push(`/${slug}`);
   };
 
   return (
