@@ -16,37 +16,26 @@ const getData = async (teamSlug: string, pin: string) => {
   const response = await fetch(
     `${process.env.SERVER_BASE_URL}/api/meet/${teamSlug}?pin=${pin}`
   );
+
   if (response.status === 401) {
-    return {
-      error: "Invalid pin",
-      code: 401,
-    };
+    return { error: "Invalid pin", code: 401 };
   } else if (response.status === 404) {
-    return {
-      error: "Team not found",
-      code: 404,
-    };
+    return { error: "Team not found", code: 404 };
   } else if (response.status === 500) {
-    return {
-      error: "Error getting meetings",
-      code: 500,
-    };
+    return { error: "Error getting meetings", code: 500 };
   }
+
   const data = await response.json();
-  return {
-    error: null,
-    data,
-    code: 200,
-  };
+  return { error: null, data, code: 200 };
 };
 
-export default async function TeamHome({
-  params,
-}: {
+interface TeamHomeProps {
   params: { teamSlug: string };
-}) {
-  const teamSlug = params.teamSlug;
-  const pin = cookies().get(teamSlug + "_pin");
+}
+
+export default async function TeamHome({ params }: TeamHomeProps) {
+  const { teamSlug } = params;
+  const pin = (await cookies()).get(`${teamSlug}_pin`);
 
   if (!pin) {
     return <Pin teamSlug={teamSlug} />;
