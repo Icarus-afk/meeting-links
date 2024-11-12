@@ -29,48 +29,21 @@ export async function GET(
   req: Request,
   { params }: { params: { teamSlug: string } }
 ) {
-  const searchParams = new URL(req.url).searchParams;
-  const pin = searchParams.get("pin");
-  const userId = searchParams.get("userId");
-
-  if (!params.teamSlug) {
-    return NextResponse.json({ error: "Missing teamSlug" }, { status: 400 });
-  }
-
   const supabase = getSupabseClient();
-  const { data: teams, error: teamError } = await supabase
+  const { data: team, error: teamError } = await supabase
     .from("teams")
     .select("*")
     .eq("slug", params.teamSlug)
-    .limit(1);
+    .single();
 
-  if (teamError || !teams.length) {
+  if (teamError || !team) {
     return NextResponse.json({ error: "Team not found" }, { status: 404 });
-  }
-
-  const team = teams[0] as { id: string; pin: string; owner_id: string };
-
-  const { data: members, error: memberError } = await supabase
-    .from("team_members")
-    .select("*")
-    .eq("team_id", team.id)
-    .eq("user_id", userId);
-
-  if (memberError) {
-    return NextResponse.json({ error: "Error checking team membership" }, { status: 500 });
-  }
-
-  const isOwner = team.owner_id === userId;
-  const isMember = members.length > 0;
-
-  if (!isOwner && !isMember && (!pin || team.pin !== pin)) {
-    return NextResponse.json({ error: "Invalid pin" }, { status: 401 });
   }
 
   const { data: meetings, error: meetingsError } = await supabase
     .from("meetings")
     .select("*")
-    .eq("team_id", team.id);
+    .eq("team_id", team.id as string);
 
   if (meetingsError) {
     return NextResponse.json(
@@ -79,5 +52,28 @@ export async function GET(
     );
   }
 
-  return NextResponse.json({ team, meetings, isOwner, isMember }, { status: 200 });
+  const { data: links, error: linksError } = await supabase
+    .from("links")
+    .select("*")
+    .in(
+      "meeting_id",
+      meetings.map((meeting) => meeting.id)
+    );
+
+  if (linksError) {
+    return NextResponse.json(
+      { error: "Error fetching links" },
+      { status: 500 }
+    );
+  }
+
+  const meetingsWithLinks = meetings.map((meeting) => ({
+    ...meeting,
+    links: links.filter((link) => link.meeting_id === meeting.id),
+  }));
+
+  return NextResponse.json(
+    { team, meetings: meetingsWithLinks },
+    { status: 200 }
+  );
 }
