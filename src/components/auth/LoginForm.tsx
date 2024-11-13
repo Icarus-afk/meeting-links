@@ -54,7 +54,6 @@ export default function LoginForm() {
     }
   };
 
-  // Handle Google login
   const handleGoogleLogin = async (credentialResponse: any) => {
     setLoading(true);
     try {
@@ -69,16 +68,12 @@ export default function LoginForm() {
         return;
       }
 
-      // Retrieve the session after successful OAuth login
       const { data: sessionData } = await supabase.auth.getSession();
       const session = sessionData.session;
       if (session) {
         console.log("Logged in with session:", session);
 
-        // Save the session token in localStorage
         localStorage.setItem("auth-token", session.access_token);
-
-        // Redirect after successful login
         const redirectTo = searchParams.get("redirectTo") || "/";
         router.push(redirectTo);
       } else {
@@ -135,14 +130,10 @@ export default function LoginForm() {
             {/* Google Login Button */}
             <GoogleLogin
               onSuccess={handleGoogleLogin}
-              onFailure={(error) => {
-                console.error("Google login error:", error);
+              onError={() => {
+                console.error("Google login error");
                 setError("Google login failed. Please try again.");
               }}
-              buttonText="Login with Google"
-              cookiePolicy="single_host_origin"
-              isSignedIn={false}
-              redirectUri={process.env.NEXT_PUBLIC_REDIRECT_URI}
             />
           </div>
         </div>

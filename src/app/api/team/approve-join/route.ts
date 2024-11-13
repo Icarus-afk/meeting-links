@@ -2,18 +2,15 @@ import { NextResponse } from "next/server";
 import { getSupabseClient } from "@/supaClient/index";
 import { authenticate } from "@/middleware/auth";
 
-
 export async function POST(req: Request) {
   const { requestId, userId } = await req.json();
   const supabase = getSupabseClient();
 
   const user = await authenticate(req);
-  if (!user){
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  console.log("User authenticated:", user);
 
-  
   const { data: joinRequest, error: joinRequestError } = await supabase
     .from("team_members")
     .select("*")

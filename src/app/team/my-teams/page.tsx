@@ -36,7 +36,6 @@ export default function MyTeams() {
         const data = await response.json();
         setTeams(data.teams);
       } catch (error) {
-        console.error("Error fetching teams:", error);
         setError("An unexpected error occurred. Please try again.");
       }
     };
@@ -73,7 +72,6 @@ export default function MyTeams() {
         )
       );
     } catch (error) {
-      console.error("Error updating pinned status:", error);
       setError("An unexpected error occurred. Please try again.");
     }
   };

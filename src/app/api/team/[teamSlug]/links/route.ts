@@ -1,21 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getSupabseClient } from "@/supaClient/index";
 import { authenticate } from "@/middleware/auth";
 
 export async function GET(
-  req: Request,
-  context: { params: { teamSlug: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ teamSlug: string }> }
 ) {
-  const { teamSlug } = context.params;
+  const { teamSlug } = await params;
   const supabase = getSupabseClient();
 
   const user = await authenticate(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  console.log("User authenticated:", user);
 
-  // Fetch team data
   const { data: team, error: teamError } = await supabase
     .from("teams")
     .select("*")
@@ -25,8 +23,6 @@ export async function GET(
   if (teamError || !team) {
     return NextResponse.json({ error: "Team not found" }, { status: 404 });
   }
-
-  // Fetch links associated with the team
   const { data: links, error: linksError } = await supabase
     .from("links")
     .select("*")
@@ -43,23 +39,19 @@ export async function GET(
 }
 
 export async function POST(
-  req: Request,
-  context: { params: { teamSlug: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ teamSlug: string }> }
 ) {
-  const { teamSlug } = await context.params;
+  const { teamSlug } = await params;
   const supabase = getSupabseClient();
 
   const user = await authenticate(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  console.log("User authenticated:", user);
 
   const { title, description, url } = await req.json();
 
-  console.log({ title, description, url });
-
-  // Fetch team data
   const { data: team, error: teamError } = await supabase
     .from("teams")
     .select("*")

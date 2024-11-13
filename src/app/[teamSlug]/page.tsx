@@ -30,11 +30,11 @@ const getData = async (teamSlug: string, pin: string) => {
 };
 
 interface TeamHomeProps {
-  params: { teamSlug: string };
+  params: Promise<{ teamSlug: string }>;
 }
 
 export default async function TeamHome({ params }: TeamHomeProps) {
-  const { teamSlug } = params;
+  const { teamSlug } = await params;
   const pin = (await cookies()).get(`${teamSlug}_pin`);
 
   if (!pin) {

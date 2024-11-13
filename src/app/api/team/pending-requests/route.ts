@@ -13,10 +13,10 @@ export async function GET(req: Request) {
   const supabase = getSupabseClient();
 
   const user = await authenticate(req);
-  if (!user){
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-    
+
   const { data: teams, error: teamsError } = await supabase
     .from("teams")
     .select("id, name")

@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   const supabase = getSupabseClient();
 
   const user = await authenticate(req);
-  if (!user){
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -21,22 +21,43 @@ export async function GET(req: Request) {
     .from("team_members")
     .select("team_id")
     .eq("user_id", userId)
-    .eq("status", "approved");  
+    .eq("status", "approved");
 
   if (teamIdsError) {
     return NextResponse.json({ error: teamIdsError.message }, { status: 500 });
   }
 
-  const teamIds = teamIdsData?.map((item) => item.team_id);
+  const teamIds = teamIdsData?.map((item) => item.team_id) ?? [];
 
-  const { data: teams, error } = await supabase
+  const { data: teams, error: teamsError } = await supabase
     .from("teams")
     .select("*")
     .or(`owner_id.eq.${userId},id.in.(${teamIds.join(",")})`);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (teamsError) {
+    return NextResponse.json({ error: teamsError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ teams }, { status: 200 });
+  const { data: pinnedTeamsData, error: pinnedTeamsError } = await supabase
+    .from("pinned_teams")
+    .select("team_id, pinned")
+    .eq("user_id", userId);
+
+  if (pinnedTeamsError) {
+    return NextResponse.json(
+      { error: pinnedTeamsError.message },
+      { status: 500 }
+    );
+  }
+
+  const pinnedTeamsMap = new Map(
+    pinnedTeamsData.map((item) => [item.team_id, item.pinned])
+  );
+
+  const teamsWithPinnedStatus = teams.map((team) => ({
+    ...team,
+    pinned: pinnedTeamsMap.get(team.id) || false,
+  }));
+
+  return NextResponse.json({ teams: teamsWithPinnedStatus }, { status: 200 });
 }

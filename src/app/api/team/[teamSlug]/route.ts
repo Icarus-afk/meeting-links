@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getSupabseClient } from "@/supaClient/index";
 
 function generateSlug(name: string): string {
@@ -26,14 +26,15 @@ export async function POST(req: Request) {
 }
 
 export async function GET(
-  req: Request,
-  { params }: { params: { teamSlug: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ teamSlug: string }> }
 ) {
+  const slug = await params;
   const supabase = getSupabseClient();
   const { data: team, error: teamError } = await supabase
     .from("teams")
     .select("*")
-    .eq("slug", params.teamSlug)
+    .eq("slug", slug)
     .single();
 
   if (teamError || !team) {

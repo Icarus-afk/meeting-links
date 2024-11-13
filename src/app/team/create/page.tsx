@@ -58,11 +58,9 @@ export default function CreateTeam() {
       if (response.ok) {
         router.push(`/team/${data.slug}/links`);
       } else {
-        console.error("Error creating team:", data.error);
         setError(data.error);
       }
     } catch (error) {
-      console.error("Error creating team:", error);
       setError("An unexpected error occurred. Please try again.");
     }
   };

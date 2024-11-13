@@ -12,7 +12,6 @@ export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
     try {
       const parsedData = JSON.parse(tokenData);
       token = parsedData.access_token;
-      console.log("TOKEN ---->", token);
     } catch (error) {
       throw new Error("Error parsing auth token data");
     }

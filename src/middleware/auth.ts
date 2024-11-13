@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { getSupabseClient } from "@/supaClient/index";
 
@@ -11,7 +10,6 @@ export async function authenticate(req: Request) {
     return null;
   }
 
-  console.log("Token found:", token);
 
   const { data, error } = await supabase.auth.getUser(token);
 
@@ -20,6 +18,5 @@ export async function authenticate(req: Request) {
     return null;
   }
 
-  console.log("User authenticated:", data.user);
   return data.user;
 }

@@ -1,27 +1,25 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { getSupabseClient } from "@/supaClient/index";
 import { authenticate } from "@/middleware/auth";
 
 export async function POST(
-  req: Request,
-  context: { params: { teamSlug: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ teamSlug: string }> }
 ) {
-  const { teamSlug } = await context.params;
+  const { teamSlug } = await params;
   const { userId, pin } = await req.json();
   const supabase = getSupabseClient();
-  
+
   const user = await authenticate(req);
-  if (!user){
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  console.log("User authenticated:", user);
-  
   // Fetch team data
-  const { data: team, error: teamError } = (await supabase
+  const { data: team, error: teamError } = await supabase
     .from("teams")
     .select("*")
     .eq("slug", teamSlug)
-    .single()) as { data: { id: string; pin: string } | null; error: any };
+    .single();
 
   if (teamError || !team) {
     return NextResponse.json({ error: "Team not found" }, { status: 404 });
@@ -31,7 +29,7 @@ export async function POST(
   const { data: existingRequest, error: existingRequestError } = await supabase
     .from("team_members")
     .select("*")
-    .eq("team_id", team.id)
+    .eq("team_id", team.id as string)
     .eq("user_id", userId)
     .single();
 
