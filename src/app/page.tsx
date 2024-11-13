@@ -68,7 +68,7 @@ export default function Home() {
     }
 
     try {
-      const response = await fetchWithAuth(
+      const response = await fetch(
         `/api/team/search?query=${e.target.value}&userId=${user?.id}`
       );
       if (!response.ok) {
